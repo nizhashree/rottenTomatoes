@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		654F670D7ED2AC41DEA58818 /* libPods-RottenTomatoes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1AF335391B5CC1DDA837705 /* libPods-RottenTomatoes.a */; };
 		FE35568D1BD6F2D8000D1612 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FE35568C1BD6F2D8000D1612 /* main.m */; };
 		FE3556901BD6F2D8000D1612 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = FE35568F1BD6F2D8000D1612 /* AppDelegate.m */; };
 		FE3556931BD6F2D8000D1612 /* MoviesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FE3556921BD6F2D8000D1612 /* MoviesViewController.m */; };
@@ -19,6 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		05DC0CE41BF221DD0A9C359F /* Pods-RottenTomatoes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RottenTomatoes.release.xcconfig"; path = "Pods/Target Support Files/Pods-RottenTomatoes/Pods-RottenTomatoes.release.xcconfig"; sourceTree = "<group>"; };
+		A1AF335391B5CC1DDA837705 /* libPods-RottenTomatoes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RottenTomatoes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D7E93A9CE5E510D92196B8A2 /* Pods-RottenTomatoes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RottenTomatoes.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RottenTomatoes/Pods-RottenTomatoes.debug.xcconfig"; sourceTree = "<group>"; };
 		FE3556881BD6F2D8000D1612 /* RottenTomatoes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RottenTomatoes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE35568C1BD6F2D8000D1612 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FE35568E1BD6F2D8000D1612 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -41,17 +45,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				654F670D7ED2AC41DEA58818 /* libPods-RottenTomatoes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		830B256CB655D3B233025F5A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1AF335391B5CC1DDA837705 /* libPods-RottenTomatoes.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		92C61A13EF07DF635B7A9F34 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D7E93A9CE5E510D92196B8A2 /* Pods-RottenTomatoes.debug.xcconfig */,
+				05DC0CE41BF221DD0A9C359F /* Pods-RottenTomatoes.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		FE35567F1BD6F2D8000D1612 = {
 			isa = PBXGroup;
 			children = (
 				FE35568A1BD6F2D8000D1612 /* RottenTomatoes */,
 				FE3556891BD6F2D8000D1612 /* Products */,
+				92C61A13EF07DF635B7A9F34 /* Pods */,
+				830B256CB655D3B233025F5A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,9 +123,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FE35569F1BD6F2D8000D1612 /* Build configuration list for PBXNativeTarget "RottenTomatoes" */;
 			buildPhases = (
+				CE8D5FDB704638DC559C689D /* Check Pods Manifest.lock */,
 				FE3556841BD6F2D8000D1612 /* Sources */,
 				FE3556851BD6F2D8000D1612 /* Frameworks */,
 				FE3556861BD6F2D8000D1612 /* Resources */,
+				53D81BF65F8E62D30F0CB1F8 /* Embed Pods Frameworks */,
+				61D6AC61BE91EFCE1702093D /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -157,6 +184,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		53D81BF65F8E62D30F0CB1F8 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RottenTomatoes/Pods-RottenTomatoes-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		61D6AC61BE91EFCE1702093D /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RottenTomatoes/Pods-RottenTomatoes-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CE8D5FDB704638DC559C689D /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FE3556841BD6F2D8000D1612 /* Sources */ = {
@@ -277,6 +352,7 @@
 		};
 		FE3556A01BD6F2D8000D1612 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D7E93A9CE5E510D92196B8A2 /* Pods-RottenTomatoes.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = RottenTomatoes/Info.plist;
@@ -288,6 +364,7 @@
 		};
 		FE3556A11BD6F2D8000D1612 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05DC0CE41BF221DD0A9C359F /* Pods-RottenTomatoes.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = RottenTomatoes/Info.plist;
@@ -316,6 +393,7 @@
 				FE3556A11BD6F2D8000D1612 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

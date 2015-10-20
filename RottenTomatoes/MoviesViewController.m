@@ -8,7 +8,7 @@
 
 #import "MoviesViewController.h"
 #import "MoviesTableViewCell.h"
-//#import "UIImageView+AFNetworking.h"
+#import "UIImageView+AFNetworking.h"
 #import "MovieDetailsViewController.h"
 
 @interface MoviesViewController () <UITableViewDataSource, UITableViewDelegate>
@@ -38,7 +38,7 @@
     cell.TitleLabel.text = self.movies[indexPath.row][@"title"];
     cell.SynopsisLabel.text = self.movies[indexPath.row][@"synopsis"];
     NSURL *url = [NSURL URLWithString:self.movies[indexPath.row][@"posters"][@"thumbnail"]];
-//    [cell.Thumbnail setImageWithUrl: url];
+    [cell.Thumbnail setImageWithURL: url];
     return cell;
 }
 
