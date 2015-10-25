@@ -10,4 +10,5 @@
 
 @interface MovieDetailsViewController : UIViewController
 
+-(void) setJson:(NSDictionary*) dictionaryData;
 @end

@@ -37,6 +37,7 @@
     MoviesTableViewCell *cell = [self.MoviesTableView dequeueReusableCellWithIdentifier:@"movieCell"];
     cell.TitleLabel.text = self.movies[indexPath.row][@"title"];
     cell.SynopsisLabel.text = self.movies[indexPath.row][@"synopsis"];
+    cell.movieJson = self.movies[indexPath.row];
     NSURL *url = [NSURL URLWithString:self.movies[indexPath.row][@"posters"][@"thumbnail"]];
     [cell.Thumbnail setImageWithURL: url];
     return cell;
@@ -64,7 +65,6 @@
                                                     [NSJSONSerialization JSONObjectWithData:data
                                                                                     options:kNilOptions
                                                                                       error:&jsonError];
-                                                    NSLog(@"Response: %@", responseDictionary);
                                                     self.movies = responseDictionary[@"movies"];
                                                     [self.MoviesTableView reloadData];
                                                 } else {
@@ -75,7 +75,10 @@
 }
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [self.MoviesTableView deselectRowAtIndexPath:indexPath animated:YES];
+    MoviesTableViewCell *selectedCell=[tableView cellForRowAtIndexPath:indexPath];
     MovieDetailsViewController *vc = [[MovieDetailsViewController alloc] init];
+    vc.edgesForExtendedLayout = UIRectEdgeNone;
+    [vc setJson:selectedCell.movieJson];
     [self.navigationController pushViewController:vc animated:YES];
 }
 @end

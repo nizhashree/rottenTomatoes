@@ -8,8 +8,9 @@
 
 #import "MoviesTableViewCell.h"
 
-@implementation MoviesTableViewCell
-
+@implementation MoviesTableViewCell{
+  
+}
 - (void)awakeFromNib {
     // Initialization code
 }
