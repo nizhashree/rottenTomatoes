@@ -9,10 +9,12 @@
 #import "MovieDetailsViewController.h"
 #import "UIImageView+AFNetworking.h"
 
-@interface MovieDetailsViewController () <UIScrollViewDelegate, UITextViewDelegate>
+@interface MovieDetailsViewController () <UIScrollViewDelegate>
 @property (strong, nonatomic) NSDictionary* movieJson;
+@property (weak, nonatomic) IBOutlet UILabel *MovieTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *CriticsLabel;
 @property (weak, nonatomic) IBOutlet UIScrollView *SynopsisScrollView;
-@property (weak, nonatomic) IBOutlet UITextView *SynopsisTextView;
+@property (weak, nonatomic) IBOutlet UILabel *SynopsisLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *DetailsImageView;
 @property (nonatomic, assign) CGFloat lastContentOffset;
 @property CGRect SynopsisScrollViewFrame;
@@ -38,7 +40,27 @@ typedef enum ScrollDirection {
 }
 -(void) setImage {
    NSURL *url = [NSURL URLWithString:self.movieJson[@"posters"][@"original"]];
-    [self.DetailsImageView setImageWithURL:url];
+    NSString *originalUrlString = self.movieJson[@"posters"][@"original"];
+    
+    NSRange range = [originalUrlString rangeOfString:@".*cloudfront.net/"
+                                             options:NSRegularExpressionSearch];
+    
+    NSString *newUrlString = [originalUrlString stringByReplacingCharactersInRange:range
+                                                                        withString:@"https://content6.flixster.com/"];
+    NSURLRequest *highResolutionUrl = [NSURLRequest requestWithURL:[NSURL URLWithString: newUrlString]];
+  [self.DetailsImageView setImageWithURL:url];
+  [self.DetailsImageView setImageWithURLRequest:highResolutionUrl
+        placeholderImage:nil
+        success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+            [UIView transitionWithView:self.DetailsImageView
+                    duration:0.3
+                    options:UIViewAnimationOptionTransitionCrossDissolve
+                    animations:^{
+                            self.DetailsImageView.image = image;
+                    }
+                    completion:NULL];
+                }
+        failure:NULL];
     
 }
 -(void) setSynopsis {
@@ -47,20 +69,21 @@ typedef enum ScrollDirection {
     paragraphStyle.maximumLineHeight = 20.0f;
     paragraphStyle.minimumLineHeight = 20.0f;
     NSString *string = self.movieJson[@"synopsis"];
-    UIFont *font = [UIFont fontWithName:@"Arial" size:15];
     NSDictionary *attribute = @{
-                                NSParagraphStyleAttributeName : paragraphStyle,
-                                NSFontAttributeName: font
+                                NSParagraphStyleAttributeName : paragraphStyle
                                 };
-    self.SynopsisTextView.attributedText = [[NSAttributedString alloc] initWithString:string attributes:attribute];
-    self.SynopsisTextView.textAlignment = NSTextAlignmentLeft;
-    self.SynopsisTextView.textColor = [UIColor whiteColor];
+    self.SynopsisLabel.attributedText = [[NSAttributedString alloc] initWithString:string attributes:attribute];
+    self.SynopsisLabel.textAlignment = NSTextAlignmentLeft;
+    self.SynopsisLabel.textColor = [UIColor whiteColor];
+}
+- (void) setCriticsAndTitle {
+    self.MovieTitleLabel.text = [NSString stringWithFormat:@"%@ (%@)", self.movieJson[@"title"], self.movieJson[@"year"]];
+    self.CriticsLabel.text = [NSString stringWithFormat:@"Critics Score: %@, Audience Score: %@", self.movieJson[@"ratings"][@"critics_score"], self.movieJson[@"ratings"][@"audience_score"]];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.SynopsisScrollView.delegate = self;
-    self.SynopsisTextView.delegate = self;
-    NSLog(@"%@", self.SynopsisScrollView.delegate);
+    [self setCriticsAndTitle];
     [self setImage];
     [self setSynopsis];
 //    CGFloat contentWidth = self.SynopsisScrollView.bounds.size.width;
@@ -69,7 +92,7 @@ typedef enum ScrollDirection {
     [self.SynopsisScrollView sizeToFit];
     self.SynopsisScrollViewFrame = self.SynopsisScrollView.frame;
     self.SynopsisScrollView.scrollEnabled = NO;
-    self.SynopsisTextView.scrollEnabled = NO;
+    self.SynopsisScrollView.alwaysBounceVertical = YES;
     UISwipeGestureRecognizer *swipeGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGestureDown:)];
     swipeGesture.direction = UISwipeGestureRecognizerDirectionDown;
     [self.SynopsisScrollView addGestureRecognizer:swipeGesture];
@@ -93,18 +116,17 @@ typedef enum ScrollDirection {
 }
 
 -(void) animateScrollUp {
-    [UIView animateWithDuration:1 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
         self.SynopsisScrollView.contentSize = self.view.bounds.size;
         self.SynopsisScrollView.frame = self.view.bounds;
         [self.SynopsisScrollView setContentOffset:CGPointMake(0,0) animated:YES];
 //        CGFloat contentWidth = self.view.bounds.size.width;
 //        CGFloat contentHeight = self.view.bounds.size.height * 3;
 //        self.SynopsisTextView.contentSize = CGSizeMake(contentWidth, contentHeight);
-        [self.SynopsisTextView sizeToFit];
-        [self.SynopsisTextView setContentOffset:CGPointMake(0,0) animated:YES];
-        self.SynopsisScrollView.bounces = YES;
-        self.SynopsisTextView.bounces = YES;
-        self.SynopsisTextView.scrollEnabled = YES;
+        [self.SynopsisLabel sizeToFit];
+//        self.SynopsisScrollView.bounces = YES;
+//        self.SynopsisTextView.bounces = YES;
+//        self.SynopsisTextView.scrollEnabled = YES;
         
     } completion:^(BOOL finished) {
         NSLog(@"done");
@@ -112,12 +134,11 @@ typedef enum ScrollDirection {
 }
 
 -(void) animateScrollDown{
-    [UIView animateWithDuration:1 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
         self.SynopsisScrollView.frame = self.SynopsisScrollViewFrame;
         [self.SynopsisScrollView sizeToFit];
         self.SynopsisScrollView.bounces = YES;
-        self.SynopsisTextView.bounces = YES;
-        self.SynopsisTextView.scrollEnabled = NO;
+        self.SynopsisScrollView.scrollEnabled = NO;
     } completion:^(BOOL finished) {
         NSLog(@"done2");
     }];
