@@ -12,6 +12,7 @@
 #import "MovieDetailsViewController.h"
 
 @interface MoviesViewController () <UITableViewDataSource, UITableViewDelegate>
+@property (weak, nonatomic) IBOutlet UIImageView *LoadingImage;
 @property (weak, nonatomic) IBOutlet UITableView *MoviesTableView;
 @property (strong, nonatomic) NSArray *movies;
 @end
@@ -22,7 +23,17 @@
     [super viewDidLoad];
     self.MoviesTableView.dataSource = self;
     self.MoviesTableView.delegate = self;
+    self.RefreshingLabel.hidden = YES;
     self.title = @"Movies";
+    if(self.movies == NULL){
+        [self.LoadingImage setCenter:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)];
+        self.LoadingImage.hidden = NO;
+        self.MoviesTableView.hidden = YES;
+    }
+    else{
+        self.LoadingImage.hidden = YES;
+        self.MoviesTableView.hidden = NO;
+    }
     [self fetchMovies];
 }
 
@@ -33,13 +44,57 @@
     return self.movies.count;
 }
 
+-(void) setThumbnail:(MoviesTableViewCell*) Moviecell1:(NSInteger) row {
+//    NSURL *url = [NSURL URLWithString:self.movies[row][@"posters"][@"original"]];
+    Moviecell1.Thumbnail.hidden = NO;
+    NSString *originalUrlString = self.movies[row][@"posters"][@"thumbnail"];
+    NSURLRequest *lowResolutionUrl = [NSURLRequest requestWithURL:[NSURL URLWithString: originalUrlString]];
+    NSRange range = [originalUrlString rangeOfString:@".*cloudfront.net/"
+                                             options:NSRegularExpressionSearch];
+    
+    NSString *newUrlString = [originalUrlString stringByReplacingCharactersInRange:range
+                                                                        withString:@"https://content6.flixster.com/"];
+    Moviecell1.Thumbnail.contentMode = UIViewContentModeScaleToFill;
+    NSURLRequest *highResolutionUrl = [NSURLRequest requestWithURL:[NSURL URLWithString: newUrlString]
+                                                       cachePolicy:NSURLRequestReturnCacheDataElseLoad
+                                                   timeoutInterval:60];
+    [Moviecell1.Thumbnail setImageWithURLRequest: lowResolutionUrl
+            placeholderImage:nil
+            success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+                Moviecell1.LoadingLabel.hidden = YES;
+                Moviecell1.Thumbnail.image = image;
+                [Moviecell1.Thumbnail setImageWithURLRequest:highResolutionUrl
+                                            placeholderImage:nil
+                                                     success:^(NSURLRequest *request, NSHTTPURLResponse *response, UIImage *image) {
+                                                         Moviecell1.LoadingLabel.hidden = YES;
+                                                         if(response != NULL){
+                                                             [UIView transitionWithView:Moviecell1
+                                                                               duration:1
+                                                                                options:UIViewAnimationOptionTransitionCrossDissolve
+                                                                             animations:^{
+                                                                                 Moviecell1.Thumbnail.image = image;
+                                                                             }
+                                                                             completion:NULL];
+                                                         }else{
+                                                             Moviecell1.Thumbnail.image = image;
+                                                         }
+                                                     }
+                                                     failure:NULL];
+                }
+            failure:NULL];
+
+    
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     MoviesTableViewCell *cell = [self.MoviesTableView dequeueReusableCellWithIdentifier:@"movieCell"];
+    cell.Thumbnail.image = NULL;
+    cell.Thumbnail.hidden = YES;
+    cell.LoadingLabel.hidden = NO;
     cell.TitleLabel.text = self.movies[indexPath.row][@"title"];
     cell.SynopsisLabel.text = self.movies[indexPath.row][@"synopsis"];
     cell.movieJson = self.movies[indexPath.row];
-    NSURL *url = [NSURL URLWithString:self.movies[indexPath.row][@"posters"][@"thumbnail"]];
-    [cell.Thumbnail setImageWithURL: url];
+    [self setThumbnail:cell:indexPath.row];
     return cell;
 }
 
@@ -66,7 +121,16 @@
                                                                                     options:kNilOptions
                                                                                       error:&jsonError];
                                                     self.movies = responseDictionary[@"movies"];
-                                                    [self.MoviesTableView reloadData];
+                                                    double delayInSeconds = 2.0;
+                                                    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                                                    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                                        NSLog(@"After sleep");
+                                                        self.LoadingImage.alpha = YES;
+                                                        self.MoviesTableView.hidden = NO;
+
+                                                        [self.MoviesTableView reloadData];
+                                                    });
+                                                    
                                                 } else {
                                                     NSLog(@"An error occurred: %@", error.description);
                                                 }
@@ -80,5 +144,13 @@
     vc.edgesForExtendedLayout = UIRectEdgeNone;
     [vc setJson:selectedCell.movieJson];
     [self.navigationController pushViewController:vc animated:YES];
+}
+
+-(void) scrollViewDidScroll:(UIScrollView *)scrollView {
+    if (self.MoviesTableView.contentOffset.y < 0)
+    {
+        NSLog(@"Bounced up");
+        
+    }
 }
 @end

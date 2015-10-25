@@ -13,4 +13,5 @@
 @property (weak, nonatomic) IBOutlet UILabel *SynopsisLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *Thumbnail;
 @property (strong, nonatomic) NSDictionary *movieJson;
+@property (weak, nonatomic) IBOutlet UILabel *LoadingLabel;
 @end
