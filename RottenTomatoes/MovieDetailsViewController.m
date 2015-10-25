@@ -68,6 +68,8 @@ typedef enum ScrollDirection {
 //    self.SynopsisScrollView.contentSize = CGSizeMake(contentWidth, contentHeight);
     [self.SynopsisScrollView sizeToFit];
     self.SynopsisScrollViewFrame = self.SynopsisScrollView.frame;
+    self.SynopsisScrollView.scrollEnabled = NO;
+    self.SynopsisTextView.scrollEnabled = NO;
     UISwipeGestureRecognizer *swipeGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeGestureDown:)];
     swipeGesture.direction = UISwipeGestureRecognizerDirectionDown;
     [self.SynopsisScrollView addGestureRecognizer:swipeGesture];
@@ -79,21 +81,47 @@ typedef enum ScrollDirection {
 
 -(void)handleSwipeGestureDown:(UISwipeGestureRecognizer *) sender
 {
-    self.SynopsisScrollView.frame = self.SynopsisScrollViewFrame;
-    [self.SynopsisScrollView sizeToFit];
+    NSLog(@"swipe down event");
+    [self animateScrollDown];
 }
 
 
 -(void)handleSwipeGestureUp:(UISwipeGestureRecognizer *) sender
 {
-    self.SynopsisScrollView.contentSize = self.view.bounds.size;
-    self.SynopsisScrollView.frame = self.view.bounds;
-    [self.SynopsisScrollView setContentOffset:CGPointMake(0,0) animated:YES];
-    [self.SynopsisTextView sizeToFit];
-    [self.SynopsisTextView setContentOffset:CGPointMake(0,0) animated:YES];
+     NSLog(@"swipe up event");
+    [self animateScrollUp];
 }
 
+-(void) animateScrollUp {
+    [UIView animateWithDuration:1 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.SynopsisScrollView.contentSize = self.view.bounds.size;
+        self.SynopsisScrollView.frame = self.view.bounds;
+        [self.SynopsisScrollView setContentOffset:CGPointMake(0,0) animated:YES];
+//        CGFloat contentWidth = self.view.bounds.size.width;
+//        CGFloat contentHeight = self.view.bounds.size.height * 3;
+//        self.SynopsisTextView.contentSize = CGSizeMake(contentWidth, contentHeight);
+        [self.SynopsisTextView sizeToFit];
+        [self.SynopsisTextView setContentOffset:CGPointMake(0,0) animated:YES];
+        self.SynopsisScrollView.bounces = YES;
+        self.SynopsisTextView.bounces = YES;
+        self.SynopsisTextView.scrollEnabled = YES;
+        
+    } completion:^(BOOL finished) {
+        NSLog(@"done");
+    }];
+}
 
+-(void) animateScrollDown{
+    [UIView animateWithDuration:1 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+        self.SynopsisScrollView.frame = self.SynopsisScrollViewFrame;
+        [self.SynopsisScrollView sizeToFit];
+        self.SynopsisScrollView.bounces = YES;
+        self.SynopsisTextView.bounces = YES;
+        self.SynopsisTextView.scrollEnabled = NO;
+    } completion:^(BOOL finished) {
+        NSLog(@"done2");
+    }];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -113,22 +141,13 @@ typedef enum ScrollDirection {
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
     CGFloat tmpContentOffsetX = scrollView.contentOffset.x;
     CGFloat tmpContentOffsetY = scrollView.contentOffset.y;
-    if (tmpContentOffsetY > self.currentScrollOffsetY){
-        self.SynopsisScrollView.contentSize = self.view.bounds.size;
-        self.SynopsisScrollView.frame = self.view.bounds;
-        [scrollView setContentOffset:CGPointMake(0,0) animated:YES];
-        [self.SynopsisTextView sizeToFit];
-        [self.SynopsisTextView setContentOffset:CGPointMake(0,0) animated:YES];
-//        CGFloat fixedWidth = self.SynopsisTextView.frame.size.width;
-//        CGSize newSize = [self.SynopsisTextView sizeThatFits:CGSizeMake(fixedWidth, MAXFLOAT)];
-//        CGRect newFrame = self.SynopsisTextView.frame;
-//        newFrame.size = CGSizeMake(fmaxf(newSize.width, fixedWidth), newSize.height);
-//        self.SynopsisTextView.frame = newFrame;
-//        self.SynopsisTextView.contentSize =CGSizeMake(contentWidth, contentHeight);
+    if (tmpContentOffsetY < self.currentScrollOffsetY){
+        NSLog(@"scroll down event");
+        [self animateScrollDown];
     }
     else{
-        self.SynopsisScrollView.frame = self.SynopsisScrollViewFrame;
-        [self.SynopsisScrollView sizeToFit];
+         NSLog(@"scroll up event");
+        [self animateScrollUp];
     }
     self.currentScrollOffsetX = tmpContentOffsetX;
     self.currentScrollOffsetY = tmpContentOffsetY;
