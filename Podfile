@@ -5,5 +5,6 @@
 
 target 'RottenTomatoes' do
 pod 'AFNetworking'
+pod 'iToast'
 end
 

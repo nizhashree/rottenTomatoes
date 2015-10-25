@@ -10,9 +10,11 @@
 #import "MoviesTableViewCell.h"
 #import "UIImageView+AFNetworking.h"
 #import "MovieDetailsViewController.h"
+#import "iToast.h"
 
 @interface MoviesViewController () <UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *LoadingImage;
+@property (weak, nonatomic) IBOutlet UILabel *ErrorLabel;
 @property (weak, nonatomic) IBOutlet UITableView *MoviesTableView;
 @property (strong, nonatomic) NSArray *movies;
 @end
@@ -23,8 +25,9 @@
     [super viewDidLoad];
     self.MoviesTableView.dataSource = self;
     self.MoviesTableView.delegate = self;
-    self.RefreshingLabel.hidden = YES;
+    self.MoviesTableView.alpha = 1;
     self.title = @"Movies";
+    self.ErrorLabel.hidden = YES;
     if(self.movies == NULL){
         [self.LoadingImage setCenter:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)];
         self.LoadingImage.hidden = NO;
@@ -125,17 +128,27 @@
                                                     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
                                                     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                                                         NSLog(@"After sleep");
-                                                        self.LoadingImage.alpha = YES;
+                                                        
+                                                        self.MoviesTableView.alpha = 1;
+                                                        self.LoadingImage.hidden = YES;
                                                         self.MoviesTableView.hidden = NO;
-
+//                                                        [self showPopUp];
                                                         [self.MoviesTableView reloadData];
                                                     });
                                                     
                                                 } else {
+                                                    [self showPopUp];
                                                     NSLog(@"An error occurred: %@", error.description);
                                                 }
                                             }];
     [task resume];
+}
+- (void) showPopUp{
+    self.ErrorLabel.hidden = NO;
+    self.MoviesTableView.hidden = YES;
+    self.ErrorLabel.text = @" There was an error fetching movies data! Please try again later  ";
+//    [[[[iToast makeText:NSLocalizedString(@"There was error in fetching data. please try again", @"")]
+//     setGravity:iToastGravityCenter ]setPostion:CGPointMake(0,0) ] show];
 }
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [self.MoviesTableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -150,7 +163,9 @@
     if (self.MoviesTableView.contentOffset.y < 0)
     {
         NSLog(@"Bounced up");
-        
+        self.LoadingImage.hidden = NO;
+        self.MoviesTableView.alpha = 0.5;
+        [self fetchMovies];
     }
 }
 @end

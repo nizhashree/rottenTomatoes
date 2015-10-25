@@ -16,7 +16,14 @@
                                 <rect key="frame" x="0.0" y="263" width="320" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="115" sectionHeaderHeight="28" sectionFooterHeight="28" id="ouV-g3-XjO">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0mY-cK-Msu">
+                                <rect key="frame" x="9" y="267" width="303" height="48"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <tableView clipsSubviews="YES" alpha="0.59999999999999998" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="115" sectionHeaderHeight="28" sectionFooterHeight="28" id="ouV-g3-XjO">
                                 <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
@@ -81,13 +88,14 @@
                     </view>
                     <navigationItem key="navigationItem" id="ubI-Fa-tfv"/>
                     <connections>
+                        <outlet property="ErrorLabel" destination="0mY-cK-Msu" id="dnB-qr-46e"/>
                         <outlet property="LoadingImage" destination="Qp0-82-keY" id="GSt-2r-Hmy"/>
                         <outlet property="MoviesTableView" destination="ouV-g3-XjO" id="Mwc-R9-l29"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="694" y="354"/>
+            <point key="canvasLocation" x="746" y="335"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="r3t-Ic-ByV">
