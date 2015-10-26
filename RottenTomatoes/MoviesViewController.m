@@ -17,6 +17,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *ErrorLabel;
 @property (weak, nonatomic) IBOutlet UITableView *MoviesTableView;
 @property (strong, nonatomic) NSArray *movies;
+@property Boolean isRefresh;
 @end
 
 @implementation MoviesViewController
@@ -28,6 +29,7 @@
     self.MoviesTableView.alpha = 1;
     self.title = @"Movies";
     self.ErrorLabel.hidden = YES;
+    self.isRefresh = NO;
     if(self.movies == NULL){
         [self.LoadingImage setCenter:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)];
         self.LoadingImage.hidden = NO;
@@ -132,7 +134,7 @@
                                                         self.MoviesTableView.alpha = 1;
                                                         self.LoadingImage.hidden = YES;
                                                         self.MoviesTableView.hidden = NO;
-//                                                        [self showPopUp];
+                                                        self.isRefresh = NO;
                                                         [self.MoviesTableView reloadData];
                                                     });
                                                     
@@ -145,10 +147,23 @@
 }
 - (void) showPopUp{
     self.ErrorLabel.hidden = NO;
-    self.MoviesTableView.hidden = YES;
-    self.ErrorLabel.text = @" There was an error fetching movies data! Please try again later  ";
-//    [[[[iToast makeText:NSLocalizedString(@"There was error in fetching data. please try again", @"")]
-//     setGravity:iToastGravityCenter ]setPostion:CGPointMake(0,0) ] show];
+    if(self.isRefresh == YES){
+        self.isRefresh = NO;
+        self.MoviesTableView.alpha = 0.3;
+        self.ErrorLabel.text = @" There was an error refreshing movies data! Please try again later  ";
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            NSLog(@"After error sleep");
+            
+            self.MoviesTableView.alpha = 1;
+            self.ErrorLabel.hidden = YES;
+            self.isRefresh = NO;
+        });
+    }
+    else{
+        self.MoviesTableView.hidden = YES;
+        self.ErrorLabel.text = @" There was an error fetching movies data! Please try again later  ";
+    }
 }
 - (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [self.MoviesTableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -163,6 +178,7 @@
     if (self.MoviesTableView.contentOffset.y < 0 && self.LoadingImage.hidden == YES)
     {
         NSLog(@"Bounced up");
+        self.isRefresh = YES;
         self.LoadingImage.hidden = NO;
         self.MoviesTableView.alpha = 0.5;
         [self fetchMovies];
