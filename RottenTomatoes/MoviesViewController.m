@@ -252,7 +252,7 @@
 - (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar {
     NSLog(@"User canceled search");
     [searchBar resignFirstResponder]; // if you want the keyboard to go away
-    self.searchResults = NULL;
+    self.SearchBar.text = NULL;
     [self.MoviesTableView reloadData];
 }
 @end
