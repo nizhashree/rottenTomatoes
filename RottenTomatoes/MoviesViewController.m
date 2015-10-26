@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *MoviesTableView;
 @property (strong, nonatomic) NSArray *movies;
 @property Boolean isRefresh;
+@property int refreshCount;
 @end
 
 @implementation MoviesViewController
@@ -119,7 +120,18 @@
                                             completionHandler:^(NSData * _Nullable data,
                                                                 NSURLResponse * _Nullable response,
                                                                 NSError * _Nullable error) {
-                                                if (!error) {
+                                                if(self.isRefresh == YES && self.refreshCount % 2 == 0){
+                                                    double delayInSeconds = 2.0;
+                                                    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                                                    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                                        NSLog(@"After sleep");
+                                                        
+                                                        self.LoadingImage.hidden = YES;
+                                                        [self showPopUp];
+                                                    });
+                                                    
+                                                }
+                                                else if (!error) {
                                                     NSError *jsonError = nil;
                                                     NSDictionary *responseDictionary =
                                                     [NSJSONSerialization JSONObjectWithData:data
@@ -139,6 +151,7 @@
                                                     });
                                                     
                                                 } else {
+                                                    self.LoadingImage.hidden = YES;
                                                     [self showPopUp];
                                                     NSLog(@"An error occurred: %@", error.description);
                                                 }
@@ -148,7 +161,6 @@
 - (void) showPopUp{
     self.ErrorLabel.hidden = NO;
     if(self.isRefresh == YES){
-        self.isRefresh = NO;
         self.MoviesTableView.alpha = 0.3;
         self.ErrorLabel.text = @" There was an error refreshing movies data! Please try again later  ";
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC));
@@ -175,12 +187,13 @@
 }
 
 -(void) scrollViewDidScroll:(UIScrollView *)scrollView {
-    if (self.MoviesTableView.contentOffset.y < 0 && self.LoadingImage.hidden == YES)
+    if (self.MoviesTableView.contentOffset.y < 0 && self.LoadingImage.hidden == YES && self.isRefresh == NO)
     {
         NSLog(@"Bounced up");
         self.isRefresh = YES;
         self.LoadingImage.hidden = NO;
         self.MoviesTableView.alpha = 0.5;
+        self.refreshCount +=1;
         [self fetchMovies];
     }
 }
