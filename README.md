@@ -18,7 +18,7 @@ The following **optional** features are implemented:
 
 - [ ] Add a tab bar for Box Office and DVD.
 - [ ] Implement segmented control to switch between list view and grid view.
-- [ ] Add a search bar.
+- [x] Add a search bar.
 - [x] All images fade in. The images from network alone has the fade in animation. The images from cache are loaded as such
 - [x] For the large poster, load the low-res image first, switch to high-res when complete.
 - [ ] Customize the highlight and selection effect of the cell.
@@ -30,7 +30,8 @@ The following **additional** features are implemented:
 - [x] The lower sectional view on the details page is rendered when the scroll down movement is initiated
 - [x] Even the list view images has loading the low-res image first, switch to high-res when complete 
 - [x] Added loading symbol for loading images on the list view too
-
+- [x] Added bounce effect on the Movie details page synopsis full page view.
+ 
 
 ## Video Walkthrough 
 
@@ -43,6 +44,11 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 ## Notes
 
 I faced challenge in bringing up the animation in the details page. I tried various ways: Using Scroll event handler, Gesture event handler. At last settled with Gesture event handlers. I am not sure if it is the right way to do so. There might be other cleaner ways to do so as well.
+
+I faced some more challenges on customizing the tableView. 
+- There were separator inlets which was making the view look bad. 
+- There were separator lines coming for the empty cells
+- UIsearch bar (X) image on the search bar doesnot trigger the cancel event. I had to put an explicit cancel button. 
 
 ## License
 

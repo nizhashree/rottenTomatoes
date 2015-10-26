@@ -124,9 +124,9 @@ typedef enum ScrollDirection {
 //        CGFloat contentHeight = self.view.bounds.size.height * 3;
 //        self.SynopsisTextView.contentSize = CGSizeMake(contentWidth, contentHeight);
         [self.SynopsisLabel sizeToFit];
-//        self.SynopsisScrollView.bounces = YES;
+        self.SynopsisScrollView.bounces = YES;
 //        self.SynopsisTextView.bounces = YES;
-//        self.SynopsisTextView.scrollEnabled = YES;
+        self.SynopsisScrollView.scrollEnabled = YES;
         
     } completion:^(BOOL finished) {
         NSLog(@"done");
@@ -158,20 +158,18 @@ typedef enum ScrollDirection {
     // Pass the selected object to the new view controller.
 }
 */
-
+//
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    CGFloat tmpContentOffsetX = scrollView.contentOffset.x;
-    CGFloat tmpContentOffsetY = scrollView.contentOffset.y;
-    if (tmpContentOffsetY < self.currentScrollOffsetY){
+    CGFloat yVelocity = [scrollView.panGestureRecognizer velocityInView:scrollView].y;
+    if (yVelocity < 0) {
+        NSLog(@"scroll up event");
+        [self animateScrollUp];
+    } else if (yVelocity > 0) {
         NSLog(@"scroll down event");
         [self animateScrollDown];
+    } else {
+        NSLog(@"Can't determine direction as velocity is 0");
     }
-    else{
-         NSLog(@"scroll up event");
-        [self animateScrollUp];
-    }
-    self.currentScrollOffsetX = tmpContentOffsetX;
-    self.currentScrollOffsetY = tmpContentOffsetY;
 }
 
 @end
