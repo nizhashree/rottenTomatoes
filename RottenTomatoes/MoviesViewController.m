@@ -12,13 +12,16 @@
 #import "MovieDetailsViewController.h"
 #import "iToast.h"
 
-@interface MoviesViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface MoviesViewController () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *LoadingImage;
 @property (weak, nonatomic) IBOutlet UILabel *ErrorLabel;
 @property (weak, nonatomic) IBOutlet UITableView *MoviesTableView;
 @property (strong, nonatomic) NSArray *movies;
+@property (strong, nonatomic) NSArray *searchResults;
+@property (weak, nonatomic) IBOutlet UISearchBar *SearchBar;
 @property Boolean isRefresh;
 @property int refreshCount;
+- (void)filterContentForSearchText:(NSString*)searchText;
 @end
 
 @implementation MoviesViewController
@@ -27,6 +30,7 @@
     [super viewDidLoad];
     self.MoviesTableView.dataSource = self;
     self.MoviesTableView.delegate = self;
+    self.SearchBar.delegate = self;
     self.MoviesTableView.alpha = 1;
     self.title = @"Movies";
     self.ErrorLabel.hidden = YES;
@@ -47,13 +51,33 @@
     [super didReceiveMemoryWarning];
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.movies.count;
+    if(self.SearchBar.text.length > 0)
+        return self.searchResults.count;
+    else
+        return self.movies.count;
 }
-
--(void) setThumbnail:(MoviesTableViewCell*) Moviecell1:(NSInteger) row {
+-(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if ([tableView respondsToSelector:@selector(setSeparatorInset:)]) {
+        [tableView setSeparatorInset:UIEdgeInsetsZero];
+    }
+    
+    if ([tableView respondsToSelector:@selector(setLayoutMargins:)]) {
+        [tableView setLayoutMargins:UIEdgeInsetsZero];
+    }
+    
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:UIEdgeInsetsZero];
+    }
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    // This will create a "invisible" footer
+    return 0.001f;
+}
+-(void) setThumbnail:(MoviesTableViewCell*) Moviecell1:(NSInteger) row:(NSArray*) movieList {
 //    NSURL *url = [NSURL URLWithString:self.movies[row][@"posters"][@"original"]];
     Moviecell1.Thumbnail.hidden = NO;
-    NSString *originalUrlString = self.movies[row][@"posters"][@"thumbnail"];
+    NSString *originalUrlString = movieList[row][@"posters"][@"thumbnail"];
     NSURLRequest *lowResolutionUrl = [NSURLRequest requestWithURL:[NSURL URLWithString: originalUrlString]];
     NSRange range = [originalUrlString rangeOfString:@".*cloudfront.net/"
                                              options:NSRegularExpressionSearch];
@@ -97,10 +121,18 @@
     cell.Thumbnail.image = NULL;
     cell.Thumbnail.hidden = YES;
     cell.LoadingLabel.hidden = NO;
-    cell.TitleLabel.text = self.movies[indexPath.row][@"title"];
-    cell.SynopsisLabel.text = self.movies[indexPath.row][@"synopsis"];
-    cell.movieJson = self.movies[indexPath.row];
-    [self setThumbnail:cell:indexPath.row];
+    if(self.SearchBar.text.length > 0){
+        cell.TitleLabel.text = self.searchResults[indexPath.row][@"title"];
+        cell.SynopsisLabel.text = self.searchResults[indexPath.row][@"synopsis"];
+        cell.movieJson = self.searchResults[indexPath.row];
+        [self setThumbnail:cell:indexPath.row:self.searchResults];
+    }
+    else{
+        cell.TitleLabel.text = self.movies[indexPath.row][@"title"];
+        cell.SynopsisLabel.text = self.movies[indexPath.row][@"synopsis"];
+        cell.movieJson = self.movies[indexPath.row];
+        [self setThumbnail:cell:indexPath.row:self.movies];
+    }
     return cell;
 }
 
@@ -196,5 +228,31 @@
         self.refreshCount +=1;
         [self fetchMovies];
     }
+}
+- (void)filterContentForSearchText:(NSString*)searchText
+{
+    NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"title contains[c] %@", searchText];
+    self.searchResults = [self.movies filteredArrayUsingPredicate:resultPredicate];
+}
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    [self handleSearch:searchBar];
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
+    [self handleSearch:searchBar];
+}
+
+- (void)handleSearch:(UISearchBar *)searchBar {
+    NSLog(@"User searched for %@", searchBar.text);
+    [searchBar resignFirstResponder]; // if you want the keyboard to go away
+    [self filterContentForSearchText:searchBar.text];
+    [self.MoviesTableView reloadData];
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar {
+    NSLog(@"User canceled search");
+    [searchBar resignFirstResponder]; // if you want the keyboard to go away
+    self.searchResults = NULL;
+    [self.MoviesTableView reloadData];
 }
 @end
