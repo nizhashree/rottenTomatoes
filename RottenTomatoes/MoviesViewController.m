@@ -160,7 +160,7 @@
 }
 
 -(void) scrollViewDidScroll:(UIScrollView *)scrollView {
-    if (self.MoviesTableView.contentOffset.y < 0)
+    if (self.MoviesTableView.contentOffset.y < 0 && self.LoadingImage.hidden == YES)
     {
         NSLog(@"Bounced up");
         self.LoadingImage.hidden = NO;
